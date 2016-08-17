@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>easypage</title>
+</head>
+<link rel="stylesheet" type="text/css" href="easypage.css">
+<script type="text/javascript" src="http://libs.baidu.com/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="easypage.js"></script>
+<body>
+	<ul class="test">
+		<li>1</li>
+		<li>2</li>
+		<li>3</li>
+		<li>4</li>
+		<li>5</li>
+		<li>6</li>
+		<li>7</li>
+		<li>8</li>
+		<li>9</li>
+		<li>10</li>
+	</ul>
+	<script type="text/javascript">
+	  $('.test li').easyPage({
+	    count: 5,
+	    color: [
+	          {
+	            "background":"#444","color":"#fff","border-color":"#444"
+	          },
+	          {
+	            "background":"#fff","color":"#444","border-color":"#ccc"
+	          },
+	          {
+	            "background":"#eee","color":"#444","border-color":"#ccc"
+	          }
+	        ]
+	  });
+	</script>
+</body>
+</html>

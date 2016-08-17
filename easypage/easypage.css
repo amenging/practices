@@ -1,0 +1,20 @@
+.easy_pages {
+  padding: 0;
+  height: 40px;
+  margin: auto; 
+}
+.easy_pages li {
+  list-style: none;
+  float: left;
+  width: 34px;
+  height: 34px;
+  color: #777;
+  margin-left: -1px;
+  line-height: 34px;
+  text-align: center;
+  border: 1px solid #ccc;
+  transition: .3s; 
+}
+.easy_pages li:hover {
+  cursor: pointer; 
+}
