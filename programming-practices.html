@@ -6,32 +6,89 @@
 </head>
 <body>
 	<script type="text/javascript">
-		// 算法相关
+		// === 算法相关 ===
 
+		// 快速排序
+		function quicksort(arr) {
+			function sort(start, end) {
+				var tmp = arr[start];
+				var i = start, j = end-1;
+				if(end - start > 1) {
+					while (i < j) {
+						for (; i < j; j --) {
+							if (arr[j] <tmp) {
+								t = arr[i];
+								arr[i] = arr[j];
+								arr[j] = t;
+								break;
+							}
+						}
+						for (; i < j; i ++) {
+							if (arr[i] > tmp) {
+								t = arr[j]
+								arr[j] = arr[i]
+								arr[i] = t;
+								break;
+							}
+						}
+					}
 
+					sort(0, i)
+					sort(i + 1, end)
+				}
+			}
+			sort(0, arr.length)
+			return arr;
+		}
+
+		// console.log(quicksort([4,3,4,5,2,2,1,7,2,6]))
+
+		//两个数组的合并排序
+		function merge(arr1, arr2,cut) {
+			var l = arr1.length + arr2.length;
+			arr2.push('#');
+
+			var i = j = 0;
+			var result = [];
+
+			for (var m = 0; m < l; m ++) {
+				if (arr1[i] <= arr2[j] || arr2[j] == '#') {
+					result[m] = arr1[i]
+					i ++;
+				} else {
+					result[m] = arr2[j]
+					j ++;
+				}
+			}
+
+			return result;
+		}
+
+		// console.log(merge([1,4,6],[2,3,5,7,9], 3))
+		
 		//选择排序
 		function choose(arr) {
 			for (var i = 0; i < arr.length; i ++) {
-				var k = i; // 当前位置
-				var current = v = arr [i]; // v为当前值，current为交换做准备
+				var key = i; // 当前位置
+				var tmp = current = arr [i]; // v为当前值，current为交换做准备
 
 				for (var j = i + 1; j < arr.length; j ++) {
-					if (arr[j] < v) { // 找出最小值索引
-						k = j;
-						v = arr[j]
+					if (arr[j] < current) { // 找出最小值索引
+						key = j;
+						current = arr[j]
 					}
 				}
 
-				if (current != v) { // 若最小值索引发生改变，则交换位置
-					arr[i] = v;
-					arr[k] = current;
+				if (tmp != current) { // 若最小值索引发生改变，则交换位置
+					arr[i] = current;
+					arr[key] = tmp;
 				}
 			}
 
 			return arr;
 		}
 
-		// console.log(choose([1, 4, 2, 5]))
+		console.log(choose([1, 4, 2, 5]))
 
 		// 逆波兰式
 		function rp(str) {
@@ -212,7 +269,57 @@
 		      return false;
 		    })(i, j)
 		}
-		console.log(Find(5,[[1,2,8,9],[2,4,9,12],[4,7,10,13],[6,8,11,15]]))
+		// console.log(Find(5,[[1,2,8,9],[2,4,9,12],[4,7,10,13],[6,8,11,15]]))
+
+
+		// 牛牛有n张卡片排成一个序列.每张卡片一面是黑色的,另一面是白色的。初始状态的时候有些卡片是黑色朝上,有些卡片是白色朝上。牛牛现在想要把一些卡片翻过来,得到一种交替排列的形式,即每对相邻卡片的颜色都是不一样的。牛牛想知道最少需要翻转多少张卡片可以变成交替排列的形式。 
+		//解题思路
+		// 排序的可能性只有BWBWBW....或者WBWBWB....两种
+		// 所以如果第一位是B，就一定是第一种，反之是第二张
+		// 于是判断两种情况，实际上就是将参数与两种形式都做比较
+		// 选出翻转次数小的
+		function bw(s) {
+			var a = s.split('')
+			var n1 = 0;
+			var n2 = 0;
+			for (var i =0; i < s.length; i ++) {
+				if (i % 2 == 0) {
+					if (s[i] == 'W') {
+						n1 += 1;
+					} else {
+						n2 += 1;
+					}
+				} else {
+					if (s[i] == 'B') {
+						n1 += 1;
+					} else {
+						n2 += 1;
+					}
+				}
+			}
+			console.log(Math.min(n1, n2))
+		}
+
+		// bw('BBWBWWBWBWWBBBWBWBWBBWBBW')
+
+		// 牛牛变得黑化了,想要摧毁掉地球。但他忘记了开启地球毁灭器的密码。牛牛手里有一个字符串S,牛牛还记得从S中去掉一个字符就恰好是正确的密码,请你帮牛牛求出他最多需要尝试多少次密码。
+		// 如样例所示S = "ABA",3个可能的密码是"BA", "AA", "AB".
+		// 当S = "A", 牛牛唯一可以尝试的密码是一个空的密码,所以输出1.
+		// 解题思路
+		// 列出所有可能性，去重
+		function earth(s) {
+			var a = s.split('')
+			var b = []
+			for (var i = 0; i < s.length; i ++) {
+				var arr = [].concat(a);
+				arr.splice(i, 1);
+				if(b.indexOf(arr.join('')) == -1) {
+					b.push(arr.join(''))
+				}
+			}
+			console.log(b.length)
+		} 
+		// earth('A')
 	</script>
 </body>
 </html>
