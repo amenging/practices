@@ -1,0 +1,3 @@
+# practices
+一些编程的练习和小demo
+game是一个小游戏，暂时只能使用手机或者chrome控制台模拟手机查看
