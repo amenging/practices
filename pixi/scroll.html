@@ -116,16 +116,22 @@
       this.wallSlices = []
     }
 
-    Main.prototype.borrowWallSprites = function (num) {
-      for (let i = 0; i < num; i ++) {
-        let sprite
-        if (i % 2 === 0) {
-          sprite = this.pool.borrowWindow()
-        } else {
-          sprite = this.pool.borrowDecoration()
-        }
+    Main.prototype.generateTestWallSpan = function () {
+      let lookupTable = [
+        this.pool.borrowFrontEdge,
+        this.pool.borrowWindow,
+        this.pool.borrowDecoration,
+        this.pool.borrowWindow,
+        this.pool.borrowDecoration,
+        this.pool.borrowWindow,
+        this.pool.borrowBackEdge
+      ]
 
-        sprite.x = -32 + (i * 64)
+      for (let i = 0; i < lookupTable.length; i ++) {
+        let func = lookupTable[i]
+
+        var sprite = func.call(this.pool)
+        sprite.x = 32 + (i * 64)
         sprite.y = 128
 
         this.wallSlices.push(sprite)
@@ -134,15 +140,23 @@
       }
     }
 
-    Main.prototype.returnWallSprites = function () {
-      for (let i = 0; i < this.wallSlices.length; i ++) {
+    Main.prototype.clearTestWallSpan = function () {
+      let lookupTable = [
+        this.pool.returnFrontEdge,
+        this.pool.returnWindow,
+        this.pool.returnDecoration,
+        this.pool.returnWindow,
+        this.pool.returnDecoration,
+        this.pool.returnWindow,
+        this.pool.returnBackEdge
+      ]
+
+      for (let i = 0; i < lookupTable.length; i ++) {
+        let func = lookupTable[i]
         let sprite = this.wallSlices[i]
+
         this.stage.removeChild(sprite)
-        if (i % 2 === 0) {
-          sprite = this.pool.returnWindow(sprite)
-        } else {
-          sprite = this.pool.returnDecoration(sprite)
-        }
+        func.call(this.pool, sprite)
       }
 
       this.wallSlices = []
