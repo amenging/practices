@@ -151,8 +151,9 @@
     // 对象池
     function WallSpritePool () {
       this.createWindows()
-
       this.createDecorations()
+      this.createFrontEdges()
+      this.createBackEdges()
     }
 
     WallSpritePool.prototype.createWindows = function () {
@@ -172,6 +173,24 @@
 
       this.shuffle(this.decorations)
     }
+    
+    WallSpritePool.prototype.createFrontEdges = function () {
+      this.frontEdges = []
+
+      this.addFrontEdgeSprites(2, 'edge_01')
+      this.addFrontEdgeSprites(2, 'edge_02')
+
+      this.shuffle(this.frontEdges)
+    }
+
+    WallSpritePool.prototype.createBackEdges = function () {
+      this.backEdges = []
+
+      this.addBackEdgeSprites(2, 'edge_01')
+      this.addBackEdgeSprites(2, 'edge_02')
+
+      this.shuffle(this.backEdges)
+    }
 
     WallSpritePool.prototype.addWindowSprites = function (amount, frameId) {
       for (let i = 0; i < amount; i ++) {
@@ -184,6 +203,22 @@
       for (let i = 0; i < amount; i ++) {
         let sprite = PIXI.Sprite.fromFrame(frameId)
         this.decorations.push(sprite)
+      }      
+    }
+
+    WallSpritePool.prototype.addFrontEdgeSprites = function (amount, frameId) {
+      for (let i = 0; i < amount; i ++) {
+        let sprite = PIXI.Sprite.fromFrame(frameId)
+        this.frontEdges.push(sprite)
+      }      
+    }
+
+    WallSpritePool.prototype.addBackEdgeSprites = function (amount, frameId) {
+      for (let i = 0; i < amount; i ++) {
+        let sprite = PIXI.Sprite.fromFrame(frameId)
+        sprite.anchor.x = 1
+        sprite.scale.x = -1
+        this.backEdges.push(sprite)
       }      
     }
     
@@ -212,6 +247,22 @@
 
     WallSpritePool.prototype.returnDecoration = function (sprite) {
       this.decorations.push(sprite)
+    }
+
+    WallSpritePool.prototype.borrowFrontEdge = function () {
+      return this.frontEdges.shift()
+    }
+
+    WallSpritePool.prototype.returnFrontEdge = function (sprite) {
+      this.frontEdges.push(sprite)
+    }
+
+    WallSpritePool.prototype.borrowBackEdge = function () {
+      return this.backEdges.shift()
+    }
+
+    WallSpritePool.prototype.returnBackEdge = function (sprite) {
+      this.backEdges.push(sprite)
     }
 
     function init () {
