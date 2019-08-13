@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>pixi</title>
+</head>
+<body>
+  <script type="text/javascript" src="./pixi.js"></script>
+  <script type="text/javascript">
+    let Application = PIXI.Application,
+        loader = PIXI.loader,
+        resources = PIXI.loader.resources,
+        Sprite = PIXI.Sprite
+
+    let app = new Application({
+      width: 256,
+      height: 256,
+      antialias: true,
+      transparent: false,
+      resolution: 1
+    })
+
+    document.body.appendChild(app.view)
+
+    function loadProgressHandler (loader, resource) {
+      console.log(resource)
+    }
+
+    loader
+      .add([
+        './cat.png',
+        './2.jpg'
+      ])
+      .on('progress', loadProgressHandler)
+      .load(setup)
+
+    function setup () {
+      let cat = new Sprite(resources['./cat.png'].texture)
+
+      cat.x = 96
+      cat.y = 96
+
+      // 宽高和缩放冲突
+      cat.scale.set(.5, .5)
+      cat.height = 120
+      cat.width = 80
+
+      app.stage.addChild(cat)
+
+      // cat.texture = PIXI.utils.TextureCache('2.jpg')
+    }
+
+    
+
+
+  </script>
+</body>
+</html>
