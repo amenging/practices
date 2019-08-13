@@ -1,0 +1,47 @@
+{"frames": {
+
+"circle1.png":
+{
+	"frame": {"x":0,"y":0,"w":51,"h":51},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":51,"h":51},
+	"sourceSize": {"w":51,"h":51}
+},
+"circle2.png":
+{
+	"frame": {"x":0,"y":108,"w":108,"h":173},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":108,"h":173},
+	"sourceSize": {"w":108,"h":173}
+},
+"circle3.png":
+{
+	"frame": {"x":51,"y":0,"w":108,"h":108},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":108,"h":108},
+	"sourceSize": {"w":108,"h":108}
+},
+"circle4.png":
+{
+	"frame": {"x":108,"y":108,"w":145,"h":145},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":145,"h":145},
+	"sourceSize": {"w":145,"h":145}
+}},
+"animations": {
+	"circle": ["circle1.png","circle2.png","circle3.png","circle4.png"]
+},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "pixi.png",
+	"format": "RGBA8888",
+	"size": {"w":253,"h":281},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:112b6ff8890787c0a5588694fda67fff:8ae48406780b7679ce609720d25bd538:7cb72418430a29c0cfc86e097f7c7202$"
+}
+}

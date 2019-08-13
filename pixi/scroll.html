@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>scroll</title>
+  <style>
+    body {
+      background-color: #000;
+    }
+    canvas {
+      background-color: #222;
+    }
+  </style>
+</head>
+<body>
+
+  <div>
+    <canvas id="game-canvas" width="512" height="384"></canvas>
+  </div>
+
+  <script type="text/javascript" src="./pixi.js"></script> 
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.0.0/pixi.min.js"></script> -->
+  <script>
+    document.body.onload = init
+    
+    // View类用于创建视图对象
+    function View (img, width, height, offset) {
+      let texture = PIXI.Texture.fromImage(img)
+      PIXI.extras.TilingSprite.call(this, texture, width, height)
+
+      this.x = 0
+      this.y = 0
+      this.tilePosition.x = 0
+      this.tilePosition.y = 0
+
+      this.viewportX = 0
+
+      this.offset = offset
+    }
+
+    View.prototype = Object.create(PIXI.extras.TilingSprite.prototype)
+
+    View.prototype.update = function () {
+      this.tilePosition.x -= this.offset
+    }
+
+    View.prototype.setViewportX = function (newViewportX) {
+      let distanceTravaled = newViewportX - this.viewportX
+      this.viewportX = newViewportX
+      this.tilePosition.x -= (distanceTravaled * this.offset)
+    }
+
+    // Scroller类用于实现滚动
+    function Scroller (stage) {
+      this.far = new View('imgs/bg-far.png', 512, 256, 0.128)
+      stage.addChild(this.far)
+
+      this.mid = new View('imgs/bg-mid.png', 512, 256, 0.64)
+      this.mid.y = 128
+      stage.addChild(this.mid)
+
+      this.viewportX = 0
+    }
+
+    Scroller.prototype.setViewportX = function (viewportX) {
+      this.viewportX = viewportX
+      this.far.setViewportX(viewportX)
+      this.mid.setViewportX(viewportX)
+    }
+
+    Scroller.prototype.getViewportX = function () {
+      return this.viewportX
+    }
+
+    Scroller.prototype.moveViewportBy = function (num) {
+      let newViewportX = this.getViewportX() + num
+      this.setViewportX(newViewportX) 
+    }
+
+    // Main类用于初始化舞台和更新视图
+    function Main () {
+      this.stage = new PIXI.Container()
+
+      this.renderer = PIXI.autoDetectRenderer(
+        512,
+        384,
+        { view: document.getElementById('game-canvas') }
+      )
+
+      this.loadSpriteSheet()
+    } 
+
+    Main.prototype.update = function () {
+      this.scroller.moveViewportBy(5)
+
+      this.renderer.render(this.stage)
+
+      requestAnimationFrame(this.update.bind(this))
+    }
+
+    Main.prototype.loadSpriteSheet = function () {
+      let loader = PIXI.loader
+      loader.add('wall', 'imgs/wall.json')
+      loader.add('bg-mid', 'imgs/bg-mid.png')
+      loader.add('bg-far', 'imgs/bg-far.png')
+      loader.once('complete', this.spriteSheetLoaded.bind(this))
+      loader.load()
+    }
+
+    Main.prototype.spriteSheetLoaded = function () {
+      this.scroller = new Scroller(this.stage)
+
+      requestAnimationFrame(this.update.bind(this))
+
+      this.pool = new WallSpritePool()
+      this.wallSlices = []
+    }
+
+    Main.prototype.borrowWallSprites = function (num) {
+      for (let i = 0; i < num; i ++) {
+        let sprite
+        if (i % 2 === 0) {
+          sprite = this.pool.borrowWindow()
+        } else {
+          sprite = this.pool.borrowDecoration()
+        }
+
+        sprite.x = -32 + (i * 64)
+        sprite.y = 128
+
+        this.wallSlices.push(sprite)
+
+        this.stage.addChild(sprite)
+      }
+    }
+
+    Main.prototype.returnWallSprites = function () {
+      for (let i = 0; i < this.wallSlices.length; i ++) {
+        let sprite = this.wallSlices[i]
+        this.stage.removeChild(sprite)
+        if (i % 2 === 0) {
+          sprite = this.pool.returnWindow(sprite)
+        } else {
+          sprite = this.pool.returnDecoration(sprite)
+        }
+      }
+
+      this.wallSlices = []
+    }
+
+    // 对象池
+    function WallSpritePool () {
+      this.createWindows()
+
+      this.createDecorations()
+    }
+
+    WallSpritePool.prototype.createWindows = function () {
+      this.windows = []
+
+      this.addWindowSprites(6, 'window_01')
+      this.addWindowSprites(6, 'window_02')
+      this.shuffle(this.windows)
+    }
+
+    WallSpritePool.prototype.createDecorations = function () {
+      this.decorations = []
+
+      this.addDecorationSprites(6, 'decoration_01')
+      this.addDecorationSprites(6, 'decoration_02')
+      this.addDecorationSprites(6, 'decoration_03')
+
+      this.shuffle(this.decorations)
+    }
+
+    WallSpritePool.prototype.addWindowSprites = function (amount, frameId) {
+      for (let i = 0; i < amount; i ++) {
+        let sprite = PIXI.Sprite.fromFrame(frameId)
+        this.windows.push(sprite)
+      }
+    }
+
+    WallSpritePool.prototype.addDecorationSprites = function (amount, frameId) {
+      for (let i = 0; i < amount; i ++) {
+        let sprite = PIXI.Sprite.fromFrame(frameId)
+        this.decorations.push(sprite)
+      }      
+    }
+    
+    // 随机打乱
+    WallSpritePool.prototype.shuffle = function (array) {
+      let len = array.length
+      let shuffles = len * 3
+      for (let i = 0; i < shuffles; i ++) {
+        let wallSlice = array.pop()
+        let pos = Math.floor(Math.random() * (len - 1))
+        array.splice(pos, 0, wallSlice)
+      }
+    }
+
+    WallSpritePool.prototype.borrowWindow = function () {
+      return this.windows.shift()
+    }
+
+    WallSpritePool.prototype.returnWindow = function (sprite) {
+      this.windows.push(sprite)
+    }
+
+    WallSpritePool.prototype.borrowDecoration = function () {
+      return this.decorations.shift()
+    }
+
+    WallSpritePool.prototype.returnDecoration = function (sprite) {
+      this.decorations.push(sprite)
+    }
+
+    function init () {
+      main = new Main()
+    }
+  </script>
+</body>
+</html>

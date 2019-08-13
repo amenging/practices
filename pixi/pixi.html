@@ -10,7 +10,9 @@
     let Application = PIXI.Application,
         loader = PIXI.loader,
         resources = PIXI.loader.resources,
-        Sprite = PIXI.Sprite
+        Sprite = PIXI.Sprite,
+        TextureCache = PIXI.utils.TextureCache,
+        Rectangle = PIXI.Rectangle
 
     let app = new Application({
       width: 256,
@@ -26,28 +28,129 @@
       console.log(resource)
     }
 
+    // loader
+    //   .add([
+    //     './cat.png',
+    //     './2.jpg',
+    //     './09.png'
+    //   ])
+    //   .on('progress', loadProgressHandler)
+    //   .load(setup)
+
+    // function setup () {
+    //   let cat = new Sprite(resources['./cat.png'].texture)
+
+    //   cat.x = 96
+    //   cat.y = 96
+
+    //   // 宽高和缩放冲突
+    //   // cat.scale.set(.3, .3)
+    //   cat.height = 120
+    //   // cat.width = 80
+
+    //   // cat.anchor.set(.5, .5)
+    //   cat.pivot.set(10, 10)
+    //   cat.rotation = .5
+
+    //   app.stage.addChild(cat)
+
+    //   // cat.texture = PIXI.utils.TextureCache('2.jpg')
+    // }
+
+    // function setup () {
+    //   let rect = TextureCache['./09.png']
+
+    //   let rectangle = new Rectangle(94, 63, 33, 33)
+
+    //   rect.frame = rectangle
+
+    //   let rocket = new Sprite(rect)
+
+    //   rocket.x = 10
+    //   rocket.y = 10
+
+    //   app.stage.addChild(rocket)
+
+    //   // renderer.render(stage)
+    // }
+
     loader
-      .add([
-        './cat.png',
-        './2.jpg'
-      ])
-      .on('progress', loadProgressHandler)
+      .add('./pixi.json')
       .load(setup)
 
+
+    let circle1, circle2
     function setup () {
-      let cat = new Sprite(resources['./cat.png'].texture)
+      circle1 = new Sprite(TextureCache['circle1.png'])
 
-      cat.x = 96
-      cat.y = 96
+      let id = resources['./pixi.json'].textures
 
-      // 宽高和缩放冲突
-      cat.scale.set(.5, .5)
-      cat.height = 120
-      cat.width = 80
+      circle1.vx = 0
+      circle1.vy = 0
 
-      app.stage.addChild(cat)
+      app.stage.addChild(circle1)
 
-      // cat.texture = PIXI.utils.TextureCache('2.jpg')
+      document.addEventListener('keydown', e => {
+        const keyCode = e.keyCode
+
+        switch (keyCode) {
+          case 37:
+            circle1.vx = -5
+            circle1.vy = 0
+            break
+          case 38:
+            circle1.vy = -5
+            circle1.vx = 0
+            break
+          case 39:
+            circle1.vy = 0
+            circle1.vx = 5
+            break
+          case 40:
+            circle1.vy = 5
+            circle1.vx = 0
+        }
+      }, false)
+
+      document.addEventListener('keyup', e => {
+        const keyCode = e.keyCode
+
+        switch (keyCode) {
+          case 37:
+            circle1.vy = 0
+            circle1.vx = 0
+            break
+          case 38:
+            circle1.vy = 0
+            circle1.vx = 0
+            break
+          case 39:
+            circle1.vy = 0
+            circle1.vx = 0
+            break
+          case 40:
+            circle1.vy = 0
+            circle1.vx = 0
+            break
+        }
+      }, false)
+
+      app.ticker.add(delta => gameLoop(delta))
+      
+      console.log(app)
+    }
+
+    
+    function gameLoop (delta) {
+      // stage的宽高会改变而不是canvas宽高？
+      // if (circle1.x < app.stage.width) {
+        circle1.x += circle1.vx
+        circle1.y += circle1.vy
+      // }
+    }
+
+    function randomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
     
