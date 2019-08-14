@@ -15,8 +15,9 @@ function Main () {
 
 Main.MIN_SCROLL_SPEED = 5
 Main.MAX_SCROLL_SPEED = 15
-Main.SCROLL_ACCELERATION = 0.005
+Main.SCROLL_ACCELERATION = 0.005 // 加速度
 
+// 更新视图
 Main.prototype.update = function () {
   this.scroller.moveViewportBy(this.scrollSpeed)
 
@@ -29,74 +30,19 @@ Main.prototype.update = function () {
   requestAnimationFrame(this.update.bind(this))
 }
 
+// 加载
 Main.prototype.loadSpriteSheet = function () {
   let loader = PIXI.loader
   loader.add('wall', 'imgs/wall.json')
   loader.add('bg-mid', 'imgs/bg-mid.png')
   loader.add('bg-far', 'imgs/bg-far.png')
-  loader.once('complete', this.spriteSheetLoaded.bind(this))
+  loader.once('complete', this.spriteSheetLoaded.bind(this)) // 加载完成后初始化舞台
   loader.load()
 }
 
 Main.prototype.spriteSheetLoaded = function () {
+  // 初始化舞台
   this.scroller = new Scroller(this.stage)
 
   requestAnimationFrame(this.update.bind(this))
-
-  // this.pool = new WallSpritePool()
-  // this.wallSlices = []
 }
-
-// Main.prototype.generateTestWallSpan = function () {
-//   let lookupTable = [
-//     this.pool.borrowFrontEdge,
-//     this.pool.borrowWindow,
-//     this.pool.borrowDecoration,
-//     this.pool.borrowStep,
-//     this.pool.borrowWindow,
-//     this.pool.borrowBackEdge
-//   ]
-
-//   const yPos = [
-//     128,
-//     128,
-//     128,
-//     192,
-//     192,
-//     192
-//   ]
-
-//   for (let i = 0; i < lookupTable.length; i ++) {
-//     let func = lookupTable[i]
-
-//     var sprite = func.call(this.pool)
-//     sprite.x = 64 + (i * 64)
-//     sprite.y = yPos[i]
-
-//     this.wallSlices.push(sprite)
-
-//     this.stage.addChild(sprite)
-//   }
-// }
-
-// Main.prototype.clearTestWallSpan = function () {
-//   console.log(this.wallSlices)
-//   let lookupTable = [
-//     this.pool.returnFrontEdge,
-//     this.pool.returnWindow,
-//     this.pool.returnDecoration,
-//     this.pool.returnStep,
-//     this.pool.returnWindow,
-//     this.pool.returnBackEdge
-//   ]
-
-//   for (let i = 0; i < lookupTable.length; i ++) {
-//     let func = lookupTable[i]
-//     let sprite = this.wallSlices[i]
-
-//     this.stage.removeChild(sprite)
-//     func.call(this.pool, sprite)
-//   }
-
-//   this.wallSlices = []
-// }

@@ -15,6 +15,7 @@ function View (img, width, height, offset) {
 
 View.prototype = Object.create(PIXI.extras.TilingSprite.prototype)
 
+// 设置循环移动距离
 View.prototype.update = function () {
   this.tilePosition.x -= this.offset
 }
