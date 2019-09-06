@@ -61,8 +61,8 @@
 
     let program = webglUtils.createProgramFromScripts(gl, ['2d-vertex-shader', '2d-fragment-shader'])
 
-    // 查询数据顶点的位置
-    let positionAttributeLocation = gl.getAttribLocation(program, 'a_position')
+    // 查询数据顶点的位置，询问顶点数据应该放在哪里
+    let positionLocation = gl.getAttribLocation(program, 'a_position')
     let colorLocation = gl.getAttribLocation(program, 'a_color')
 
     // 找到全局变量位置
@@ -71,7 +71,6 @@
     // 给位置数据创建一个缓冲
     let positionBuffer = gl.createBuffer()
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer)
-
     setGeometry(gl)
 
     // 缓冲操作是在GPU上获取顶点和其他顶点数据的一种方式。
@@ -80,7 +79,6 @@
     // gl.bufferData将数据拷贝到缓冲，这个操作一般在初始化完成。
     var colorBuffer = gl.createBuffer()
     gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer)
-
     setColors(gl)
 
     let translation = [200, 150]
@@ -154,7 +152,9 @@
 
       gl.useProgram(program)
 
-      gl.enableVertexAttribArray(positionBuffer)
+      // 告诉webgl我们想从缓冲中提供数据
+      gl.enableVertexAttribArray(positionLocation)
+      // 将缓冲绑定到ARRAY_BUFFER绑定点
       gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer)
       
       let size = 2
@@ -162,12 +162,15 @@
       let normalize = false
       let stride = 0
       let offset = 0
-      gl.vertexAttribPointer(positionAttributeLocation, size, type, normalize, stride, offset)
+      // 告诉webgl从ARRAY_BUFFER绑定点当前绑定是缓冲获取数据等
+      gl.vertexAttribPointer(positionLocation, size, type, normalize, stride, offset)
 
       gl.enableVertexAttribArray(colorLocation)
       gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer) // 必要
 
       size = 4
+      type = gl.UNSIGNED_BYTE
+      normalize = true
       gl.vertexAttribPointer(colorLocation, size, type, normalize, stride, offset)
 
       let matrix = m3.projection(gl.canvas.clientWidth, gl.canvas.clientHeight)
@@ -219,29 +222,29 @@
   }
 
   function setColors (gl) {
-    let r1 = Math.random()
-    let b1 = Math.random()
-    let g1 = Math.random()
+    let r1 = Math.random() * 256
+    let b1 = Math.random() * 256
+    let g1 = Math.random() * 256
 
-    let r2 = Math.random()
-    let b2 = Math.random()
-    let g2 = Math.random()
+    let r2 = Math.random() * 256
+    let b2 = Math.random() * 256
+    let g2 = Math.random() * 256
 
     gl.bufferData(
       gl.ARRAY_BUFFER,
       new Float32Array([
-        // r1, b1, g1, 1,
-        // r1, b1, g1, 1,
-        // r1, b1, g1, 1,
-        // r2, b2, g2, 1,
-        // r2, b2, g2, 1,
-        // r2, b2, g2, 1
-        Math.random(), Math.random(), Math.random(), 1,
-        Math.random(), Math.random(), Math.random(), 1,
-        Math.random(), Math.random(), Math.random(), 1,
-        Math.random(), Math.random(), Math.random(), 1,
-        Math.random(), Math.random(), Math.random(), 1,
-        Math.random(), Math.random(), Math.random(), 1
+        r1, b1, g1, 255,
+        r1, b1, g1, 255,
+        r1, b1, g1, 255,
+        r2, b2, g2, 255,
+        r2, b2, g2, 255,
+        r2, b2, g2, 255
+        // Math.random() * 256, Math.random() * 256, Math.random() * 256, 255,
+        // Math.random() * 256, Math.random() * 256, Math.random() * 256, 255,
+        // Math.random() * 256, Math.random() * 256, Math.random() * 256, 255,
+        // Math.random() * 256, Math.random() * 256, Math.random() * 256, 255,
+        // Math.random() * 256, Math.random() * 256, Math.random() * 256, 255,
+        // Math.random() * 256, Math.random() * 256, Math.random() * 256, 255
       ]),
       gl.STATIC_DRAW
     )
