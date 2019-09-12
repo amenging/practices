@@ -19,19 +19,23 @@
         let vShader = `
           attribute vec4 a_Position;
           attribute float a_PointSize;
+          attribute vec4 a_Color;
+          varying vec4 v_Color;
 
           void main () {
             gl_Position = a_Position;
             gl_PointSize = a_PointSize;
+            v_Color = a_Color;
           }
         `
 
         let fShader = `
           precision mediump float;
           uniform vec4 u_FragColor;
+          varying vec4 v_Color;
 
           void main () {
-            gl_FragColor = u_FragColor;
+            gl_FragColor = v_Color;
           }
         `
 
@@ -46,29 +50,33 @@
 
         let a_Position = gl.getAttribLocation(gl.program, 'a_Position')
         let a_PointSize = gl.getAttribLocation(gl.program, 'a_PointSize')
-        let u_FragColor = gl.getUniformLocation(gl.program, 'u_FragColor')
+        let a_Color = gl.getAttribLocation(gl.program, 'a_Color')
 
-        let verticesSizes = new Float32Array([
-          0.0, 0.5, 10.0,
-          -0.5, -0.5, 20.0,
-          0.5, -0.5, 30.0
+        let verticesSizesColors = new Float32Array([
+          0.0, 0.5, 10.0, 1.0, 0.0, 0.0, // first point
+          -0.5, -0.5, 20.0, 0.0, 1.0, 0.0, // second point
+          0.5, -0.5, 30.0, 0.0, 0.0, 1.0 // ...
         ])
 
-        let FSIZE = verticesSizes.BYTES_PER_ELEMENT
+        let FSIZE = verticesSizesColors.BYTES_PER_ELEMENT   
 
         console.log(FSIZE)
 
         let vertexBuffer = gl.createBuffer()
 
         gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer)
-        gl.bufferData(gl.ARRAY_BUFFER, verticesSizes, gl.STATIC_DRAW)
-        gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, FSIZE * 3, 0)
+        gl.bufferData(gl.ARRAY_BUFFER, verticesSizesColors, gl.STATIC_DRAW)
+
+        gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, FSIZE * 6, 0)
         gl.enableVertexAttribArray(a_Position)
 
-        gl.vertexAttribPointer(a_PointSize, 1, gl.FLOAT, false, FSIZE * 3, FSIZE * 2)
+        gl.vertexAttribPointer(a_PointSize, 1, gl.FLOAT, false, FSIZE * 6, FSIZE * 2)
         gl.enableVertexAttribArray(a_PointSize)
 
-        gl.drawArrays(gl.POINTS, 0, 3)
+        gl.vertexAttribPointer(a_Color, 3, gl.FLOAT, false, FSIZE * 6, FSIZE * 3)
+        gl.enableVertexAttribArray(a_Color)
+
+        gl.drawArrays(gl.TRIANGLES, 0, 3)
       }
     </script>
   </body>
