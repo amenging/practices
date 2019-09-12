@@ -13,22 +13,16 @@
     <script src="./lib/webgl-utils.js"></script>
     <script src="./lib/webgl-debug.js"></script>
     <script src="./lib/cuon-utils.js"></script>
+    <script src="./lib/cuon-matrix.js"></script>
     <script>
       function main () {
         let vShader = `
           attribute vec4 a_Position;
           uniform vec4 u_Translation;
           uniform mat4 u_xformMatrix;
-          // uniform float u_CosB, u_SinB;
-          // attribute float a_PositionSize;
 
           void main () {
             gl_Position = u_xformMatrix * a_Position;
-            // gl_Position.x = a_Position.x * u_CosB - a_Position.y * u_SinB;
-            // gl_Position.y = a_Position.x * u_SinB + a_Position.y * u_CosB;
-            // gl_Position.z = a_Position.z;
-            // gl_Position.w = 1.0;
-            // gl_PointSize = a_PositionSize;
           }
         `
 
@@ -45,14 +39,10 @@
 
         const gl = getWebGLContext(canvas, true)
 
-        // gl.clearColor(0.0, 0.0, 0.0, 0.5)
-
         gl.clear(gl.COLOR_BUFFER_BIT)
+        gl.clearColor(0, 0, 0, .5)
 
         initShaders(gl, vShader, fShader) // 此处创建gl.program
-
-        // let a_PositionSize = gl.getAttribLocation(gl.program, 'a_PositionSize')
-        // gl.vertexAttrib1f(a_PositionSize, 5.0)
 
         let u_FragColor = gl.getUniformLocation(gl.program, 'u_FragColor')
         gl.uniform4fv(u_FragColor, [Math.random(), Math.random(), Math.random(), 1])
@@ -60,48 +50,39 @@
         let u_Translation = gl.getUniformLocation(gl.program, 'u_Translation')
         gl.uniform4fv(u_Translation, [0.5, 0.5, 0.0, 0.0])
 
-        let ANGLE = -80.0
-
-        let radian = Math.PI * ANGLE / 180.0
-        let cosB = Math.cos(radian)
-        let sinB = Math.sin(radian)
-
-        // let u_CosB = gl.getUniformLocation(gl.program, 'u_CosB')
-        // let u_SinB = gl.getUniformLocation(gl.program, 'u_SinB')
-
-        // gl.uniform1f(u_CosB, cosB)
-        // gl.uniform1f(u_SinB, sinB)
-
-        // 旋转
-        // let xformMatrix = new Float32Array([
-        //   cosB, sinB, 0.0, 0.0,
-        //   -sinB, cosB, 0.0, 0.0,
-        //   0.0, 0.0, 1.0, 0.0,
-        //   0.0, 0.0, 0.0, 1.0
-        // ])
-
-        // 平移
-        // let xformMatrix = new Float32Array([
-        //   1.0, 0.0, 0.0, 0.0,
-        //   0.0, 1.0, 0.0, 0.0,
-        //   0.0, 0.0, 1.0, 0.0,
-        //   0.1, 0.1, 0.0, 1.0
-        // ])
-
-        // 缩放
-        let xformMatrix = new Float32Array([
-          0.5, 0.0, 0.0, 0.0,
-          0.0, 1.3, 0.0, 0.0,
-          0.0, 0.0, 1.0, 0.0,
-          0.0, 0.0, 0.0, 1.0
-        ])
-
         let u_xformMatrix = gl.getUniformLocation(gl.program, 'u_xformMatrix')
 
-        gl.uniformMatrix4fv(u_xformMatrix, false, xformMatrix)
+        let ANGLE = -90.0
 
-        let n = initVertexBuffers(gl)
-        gl.drawArrays(gl.TRIANGLE_FAN, 0, n)
+        // 缩放
+        let xformMatrix = new Matrix4()
+
+        let lastTime = Date.now()
+
+        let ANGLE_STEP = 10
+
+        tick()
+
+        function tick () {
+          // if (ANGLE >= 90) {
+          //   cancelAnimationFrame(tick)
+          //   return
+          // }
+
+          animate(ANGLE += 1)
+
+          requestAnimationFrame(tick)
+        }
+
+        function animate (angle) {
+          gl.clear(gl.COLOR_BUFFER_BIT)
+
+          xformMatrix.setRotate(angle, 0, 0, 1)
+          gl.uniformMatrix4fv(u_xformMatrix, false, xformMatrix.elements)
+
+          let n = initVertexBuffers(gl)
+          gl.drawArrays(gl.TRIANGLE_FAN, 0, n)
+        }
       }
 
       function initVertexBuffers (gl) {
@@ -114,7 +95,7 @@
 
         // console.log(vertices)
 
-        let n = 4
+        let n = 3
 
         let vertextBuffer = gl.createBuffer()
 
