@@ -18,11 +18,11 @@
       function main () {
         let vShader = `
           attribute vec4 a_Position;
-          uniform vec4 u_Translation;
-          uniform mat4 u_xformMatrix;
+          attribute float a_PointSize;
 
           void main () {
-            gl_Position = u_xformMatrix * a_Position;
+            gl_Position = a_Position;
+            gl_PointSize = a_PointSize;
           }
         `
 
@@ -44,70 +44,34 @@
 
         initShaders(gl, vShader, fShader) // 此处创建gl.program
 
+        let a_Position = gl.getAttribLocation(gl.program, 'a_Position')
+        let a_PointSize = gl.getAttribLocation(gl.program, 'a_PointSize')
         let u_FragColor = gl.getUniformLocation(gl.program, 'u_FragColor')
-        gl.uniform4fv(u_FragColor, [Math.random(), Math.random(), Math.random(), 1])
-        
-        let u_Translation = gl.getUniformLocation(gl.program, 'u_Translation')
-        gl.uniform4fv(u_Translation, [0.5, 0.5, 0.0, 0.0])
 
-        let u_xformMatrix = gl.getUniformLocation(gl.program, 'u_xformMatrix')
-
-        let ANGLE = -90.0
-
-        // 缩放
-        let xformMatrix = new Matrix4()
-
-        let lastTime = Date.now()
-
-        let ANGLE_STEP = 10
-
-        tick()
-
-        function tick () {
-          // if (ANGLE >= 90) {
-          //   cancelAnimationFrame(tick)
-          //   return
-          // }
-
-          animate(ANGLE += 1)
-
-          requestAnimationFrame(tick)
-        }
-
-        function animate (angle) {
-          gl.clear(gl.COLOR_BUFFER_BIT)
-
-          xformMatrix.setRotate(angle, 0, 0, 1)
-          gl.uniformMatrix4fv(u_xformMatrix, false, xformMatrix.elements)
-
-          let n = initVertexBuffers(gl)
-          gl.drawArrays(gl.TRIANGLE_FAN, 0, n)
-        }
-      }
-
-      function initVertexBuffers (gl) {
         let vertices = new Float32Array([
-          -0.5, 0.5,
+          0.0, 0.5,
           -0.5, -0.5,
-          0.5, 0.5,
           0.5, -0.5
         ])
 
-        // console.log(vertices)
+        let sizes = new Float32Array([
+          10.0, 20.0, 30.0
+        ])
 
-        let n = 3
+        let vertexBuffer = gl.createBuffer()
+        let sizeBuffer = gl.createBuffer()
 
-        let vertextBuffer = gl.createBuffer()
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, vertextBuffer)
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer)
         gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW)
-
-        let a_Position = gl.getAttribLocation(gl.program, 'a_Position')
-
         gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, 0, 0)
         gl.enableVertexAttribArray(a_Position)
 
-        return n
+        gl.bindBuffer(gl.ARRAY_BUFFER, sizeBuffer)
+        gl.bufferData(gl.ARRAY_BUFFER, sizes, gl.STATIC_DRAW)
+        gl.vertexAttribPointer(a_PointSize, 1, gl.FLOAT, false, 0, 0)
+        gl.enableVertexAttribArray(a_PointSize)
+
+        gl.drawArrays(gl.POINTS, 0, 3)
       }
     </script>
   </body>
