@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>^-^</title>
+    <title></title>
   </head>
  
   <body onload="main()">
@@ -73,14 +73,91 @@
         initShaders(gl, vShader, fShader) // 此处创建gl.program
 
         // --------------------
+
+        // 投影 视图 模型
+        let u_MvpMatrix = gl.getUniformLocation(gl.program, 'u_MvpMatrix')
+        let mvpMatrix = new Matrix4()
+        mvpMatrix.setPerspective(50, canvas.width / canvas.height, 1, 400)
+        mvpMatrix.lookAt(20.0, 10.0, 30.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0)
+
+        let u_ModelMatrix = gl.getUniformLocation(gl.program, 'u_ModelMatrix')
         
+        // 逆转置矩阵
+        let u_NormalMatrix = gl.getUniformLocation(gl.program, 'u_NormalMatrix')
+
+        let n = initVertexBuffers(gl)
+        
+        document.addEventListener('keydown', function (e) {
+          keydown(e, gl, n, mvpMatrix, u_MvpMatrix, u_NormalMatrix)
+        })
+
+        draw(gl, n, mvpMatrix, u_MvpMatrix, u_NormalMatrix)
+      }
+
+      let ANGLE_STEP = 3.0
+      let arm1Angle = -90.0
+      let arm2Angle = 0.0
+
+      function keydown (e, gl, n, mvpMatrix, u_MvpMatrix, u_NormalMatrix) {
+        switch (e.keyCode) {
+          case 38: // 上方向键
+            arm2Angle += ANGLE_STEP
+            break
+          case 40: // 下方向键
+            arm2Angle -= ANGLE_STEP
+            break
+          case 39: // 右方向键
+            arm1Angle = (arm1Angle + ANGLE_STEP) % 360
+            break
+          case 37: // 左方向键
+            arm1Angle = (arm1Angle - ANGLE_STEP) % 360
+            break
+          default: return
+        }
+
+        draw(gl, n, mvpMatrix, u_MvpMatrix, u_NormalMatrix)
+      }
+
+      let g_modelMatrix = new Matrix4(), g_mvpMatrix = new Matrix4()
+      let g_normalMatrix = new Matrix4()
+
+      function draw (gl, n, mvpMatrix, u_MvpMatrix, u_NormalMatrix) {
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+
+        let arm1Length = 10.0
+
+        g_modelMatrix.setTranslate(0.0, -12.0, 0.0)
+        g_modelMatrix.rotate(arm1Angle, 0.0, 1.0, 0.0)
+
+        drawArm(gl, n, mvpMatrix, u_MvpMatrix, u_NormalMatrix)
+
+        g_modelMatrix.translate(0.0, arm1Length, 0.0)
+        g_modelMatrix.rotate(arm2Angle, 0.0, 0.0, 1.0)
+        g_modelMatrix.scale(1.3, 1.0, 1.3)
+        drawArm(gl, n, mvpMatrix, u_MvpMatrix, u_NormalMatrix)
+      }
+
+      function drawArm (gl, n, mvpMatrix, u_MvpMatrix, u_NormalMatrix) {
+        g_mvpMatrix.set(mvpMatrix)
+        g_mvpMatrix.multiply(g_modelMatrix)
+
+        g_normalMatrix.setInverseOf(g_modelMatrix)
+        g_normalMatrix.transpose()
+
+        gl.uniformMatrix4fv(u_MvpMatrix, false, g_mvpMatrix.elements)
+        gl.uniformMatrix4fv(u_NormalMatrix, false, g_normalMatrix.elements)
+
+        gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_BYTE, 0)
+      }
+
+      function initVertexBuffers (gl) {
         let vertices = new Float32Array([
-           2.0, 2.0, 2.0,  -2.0, 2.0, 2.0,  -2.0,-2.0, 2.0,   2.0,-2.0, 2.0, // v0-v1-v2-v3 front
-           2.0, 2.0, 2.0,   2.0,-2.0, 2.0,   2.0,-2.0,-2.0,   2.0, 2.0,-2.0, // v0-v3-v4-v5 right
-           2.0, 2.0, 2.0,   2.0, 2.0,-2.0,  -2.0, 2.0,-2.0,  -2.0, 2.0, 2.0, // v0-v5-v6-v1 up
-          -2.0, 2.0, 2.0,  -2.0, 2.0,-2.0,  -2.0,-2.0,-2.0,  -2.0,-2.0, 2.0, // v1-v6-v7-v2 left
-          -2.0,-2.0,-2.0,   2.0,-2.0,-2.0,   2.0,-2.0, 2.0,  -2.0,-2.0, 2.0, // v7-v4-v3-v2 down
-           2.0,-2.0,-2.0,  -2.0,-2.0,-2.0,  -2.0, 2.0,-2.0,   2.0, 2.0,-2.0  // v4-v7-v6-v5 back
+          1.5, 10.0, 1.5, -1.5, 10.0, 1.5, -1.5,  0.0, 1.5,  1.5,  0.0, 1.5, // v0-v1-v2-v3 front
+          1.5, 10.0, 1.5,  1.5,  0.0, 1.5,  1.5,  0.0,-1.5,  1.5, 10.0,-1.5, // v0-v3-v4-v5 right
+          1.5, 10.0, 1.5,  1.5, 10.0,-1.5, -1.5, 10.0,-1.5, -1.5, 10.0, 1.5, // v0-v5-v6-v1 up
+         -1.5, 10.0, 1.5, -1.5, 10.0,-1.5, -1.5,  0.0,-1.5, -1.5,  0.0, 1.5, // v1-v6-v7-v2 left
+         -1.5,  0.0,-1.5,  1.5,  0.0,-1.5,  1.5,  0.0, 1.5, -1.5,  0.0, 1.5, // v7-v4-v3-v2 down
+          1.5,  0.0,-1.5, -1.5,  0.0,-1.5, -1.5, 10.0,-1.5,  1.5, 10.0,-1.5  // v4-v7-v6-v5 back
         ])
 
         var colors = new Float32Array([    // Colors
@@ -90,8 +167,7 @@
           1, 0, 0,   1, 0, 0,   1, 0, 0,  1, 0, 0,     // v1-v6-v7-v2 left
           1, 0, 0,   1, 0, 0,   1, 0, 0,  1, 0, 0,     // v7-v4-v3-v2 down
           1, 0, 0,   1, 0, 0,   1, 0, 0,  1, 0, 0　    // v4-v7-v6-v5 back
-       ]);
-
+        ])
 
         var normals = new Float32Array([    // Normal
           0.0, 0.0, 1.0,   0.0, 0.0, 1.0,   0.0, 0.0, 1.0,   0.0, 0.0, 1.0,  // v0-v1-v2-v3 front
@@ -100,7 +176,7 @@
          -1.0, 0.0, 0.0,  -1.0, 0.0, 0.0,  -1.0, 0.0, 0.0,  -1.0, 0.0, 0.0,  // v1-v6-v7-v2 left
           0.0,-1.0, 0.0,   0.0,-1.0, 0.0,   0.0,-1.0, 0.0,   0.0,-1.0, 0.0,  // v7-v4-v3-v2 down
           0.0, 0.0,-1.0,   0.0, 0.0,-1.0,   0.0, 0.0,-1.0,   0.0, 0.0,-1.0   // v4-v7-v6-v5 back
-        ]);
+        ])
 
         let indices = new Uint8Array([ // 无符号8位整型数
            0, 1, 2,   0, 2, 3,    // front
@@ -119,32 +195,6 @@
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer)
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW)
 
-        // 投影 视图 模型
-        let u_MvpMatrix = gl.getUniformLocation(gl.program, 'u_MvpMatrix')
-        let mvpMatrix = new Matrix4()
-
-        let u_ModelMatrix = gl.getUniformLocation(gl.program, 'u_ModelMatrix')
-        let modelMatrix = new Matrix4()
-        // modelMatrix.setRotate(80, 0, 0, 1)
-        // gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements)
-        
-        var vpMatrix = new Matrix4();   // View projection matrix
-        vpMatrix.setPerspective(30, canvas.width/canvas.height, 1, 100);
-        vpMatrix.lookAt(6, 6, 14, 0, 0, 0, 0, 1, 0);
-
-        // mvpMatrix.setPerspective(30, canvas.width / canvas.height, 1, 400)
-        // mvpMatrix.lookAt(7, 6, 5, 0, 0, 0, 0, 0, 1)
-        // mvpMatrix.multiply(modelMatrix)
-        // mvpMatrix.set(vpMatrix).multiply(modelMatrix)
-        // gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements)
-
-        // 逆转置矩阵
-        let u_NormalMatrix = gl.getUniformLocation(gl.program, 'u_NormalMatrix')
-        let normalMatrix = new Matrix4()
-        // normalMatrix.setInverseOf(modelMatrix)
-        // normalMatrix.transpose()
-        // gl.uniformMatrix4fv(u_NormalMatrix, false, normalMatrix.elements)
-
         let u_LightColor = gl.getUniformLocation(gl.program, 'u_LightColor')
         gl.uniform3f(u_LightColor, 1.0, 1.0, 1.0) // 白色光线
 
@@ -155,25 +205,7 @@
         let u_AmbientLight = gl.getUniformLocation(gl.program, 'u_AmbientLight')
         gl.uniform3f(u_AmbientLight, 0.2, 0.2, 0.2)
 
-        let r = 0
-        setInterval(() => {
-          r = r + 1
-          gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-          modelMatrix.setRotate(r, 0, 1, 0)
-          gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements)
-
-          mvpMatrix.set(vpMatrix).multiply(modelMatrix)
-          gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements)
-
-          normalMatrix.setInverseOf(modelMatrix)
-          normalMatrix.transpose()
-          gl.uniformMatrix4fv(u_NormalMatrix, false, normalMatrix.elements)
-
-          gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_BYTE, 0)
-        }, 16)
-
-
-        gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_BYTE, 0)
+        return indices.length
       }
 
       function initArrayBuffer (gl, attribute, data, num, type) {
@@ -185,69 +217,6 @@
         gl.vertexAttribPointer(a_attribute, num, type, false, 0, 0)
         gl.enableVertexAttribArray(a_attribute)
       }
-
-      function initTextures (gl, n) {
-        let texture0 = gl.createTexture()
-        let texture1 = gl.createTexture()
-
-        let u_Sampler0 = gl.getUniformLocation(gl.program, 'u_Sampler0')
-        let u_Sampler1 = gl.getUniformLocation(gl.program, 'u_Sampler1')
-
-        let image0 = new Image()
-        image0.src = 'http://img.amenging.top/birdDown.png'
-        image0.crossOrigin = true
-
-        let image1 = new Image()
-        image1.src = 'http://img.amenging.top/circle.gif'
-        image1.crossOrigin = true
-
-        console.log(image0)
-
-        image0.onload = function () {
-          // 对纹理对象进行y轴翻转
-          loadTexture(gl, n, texture0, u_Sampler0, image0, 0)
-        }
-
-        image1.onload = function () {
-          // 对纹理对象进行y轴翻转
-          loadTexture(gl, n, texture1, u_Sampler1, image1, 1)
-        }
-      }
-
-      let g_TexUnit0 = 0, g_TexUnit1 = 0
-
-      function loadTexture(gl, n, texture, sampler, image, texUnit) {
-        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1)
-        // 开启0号纹理单元
-        gl.activeTexture(gl['TEXTURE' + texUnit])
-
-        if (texUnit == 0) {
-          g_TexUnit0 = 1
-        } else {
-          g_TexUnit1 = 1
-        }
-
-        // 向target绑定纹理对象
-        gl.bindTexture(gl.TEXTURE_2D, texture)
-
-        // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-        // 以下设置让webgl能绘制任意尺寸图片
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
-
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)
-
-        gl.uniform1i(sampler, texUnit)
-
-        gl.clear(gl.COLOR_BUFFER_BIT)
-
-        if (g_TexUnit0 && g_TexUnit1) {
-          gl.drawArrays(gl.TRIANGLE_STRIP, 0, n)
-        }
-      }
-
     </script>
   </body>
 </html>
