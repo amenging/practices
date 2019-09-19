@@ -74,12 +74,12 @@
         // --------------------
         
         let vertices = new Float32Array([
-           1.0, 1.0, 1.0,  -1.0, 1.0, 1.0,  -1.0,-1.0, 1.0,   1.0,-1.0, 1.0, // v0-v1-v2-v3 front
-           1.0, 1.0, 1.0,   1.0,-1.0, 1.0,   1.0,-1.0,-1.0,   1.0, 1.0,-1.0, // v0-v3-v4-v5 right
-           1.0, 1.0, 1.0,   1.0, 1.0,-1.0,  -1.0, 1.0,-1.0,  -1.0, 1.0, 1.0, // v0-v5-v6-v1 up
-          -1.0, 1.0, 1.0,  -1.0, 1.0,-1.0,  -1.0,-1.0,-1.0,  -1.0,-1.0, 1.0, // v1-v6-v7-v2 left
-          -1.0,-1.0,-1.0,   1.0,-1.0,-1.0,   1.0,-1.0, 1.0,  -1.0,-1.0, 1.0, // v7-v4-v3-v2 down
-           1.0,-1.0,-1.0,  -1.0,-1.0,-1.0,  -1.0, 1.0,-1.0,   1.0, 1.0,-1.0  // v4-v7-v6-v5 back
+           2.0, 2.0, 2.0,  -2.0, 2.0, 2.0,  -2.0,-2.0, 2.0,   2.0,-2.0, 2.0, // v0-v1-v2-v3 front
+           2.0, 2.0, 2.0,   2.0,-2.0, 2.0,   2.0,-2.0,-2.0,   2.0, 2.0,-2.0, // v0-v3-v4-v5 right
+           2.0, 2.0, 2.0,   2.0, 2.0,-2.0,  -2.0, 2.0,-2.0,  -2.0, 2.0, 2.0, // v0-v5-v6-v1 up
+          -2.0, 2.0, 2.0,  -2.0, 2.0,-2.0,  -2.0,-2.0,-2.0,  -2.0,-2.0, 2.0, // v1-v6-v7-v2 left
+          -2.0,-2.0,-2.0,   2.0,-2.0,-2.0,   2.0,-2.0, 2.0,  -2.0,-2.0, 2.0, // v7-v4-v3-v2 down
+           2.0,-2.0,-2.0,  -2.0,-2.0,-2.0,  -2.0, 2.0,-2.0,   2.0, 2.0,-2.0  // v4-v7-v6-v5 back
         ])
 
         var colors = new Float32Array([    // Colors
@@ -124,61 +124,52 @@
 
         let u_ModelMatrix = gl.getUniformLocation(gl.program, 'u_ModelMatrix')
         let modelMatrix = new Matrix4()
-        modelMatrix.setTranslate(0, 1, 0)
-        modelMatrix.rotate(10, 0, 0, 1)
-        gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements)
+        // modelMatrix.setRotate(80, 0, 0, 1)
+        // gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements)
+        
+        var vpMatrix = new Matrix4();   // View projection matrix
+        vpMatrix.setPerspective(30, canvas.width/canvas.height, 1, 100);
+        vpMatrix.lookAt(6, 6, 14, 0, 0, 0, 0, 1, 0);
 
-        mvpMatrix.setPerspective(30, canvas.width / canvas.height, 1, 400)
-        mvpMatrix.lookAt(7, 6, 5, 0, 0, 0, 0, 0, 1)
-        mvpMatrix.multiply(modelMatrix)
-        gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements)
+        // mvpMatrix.setPerspective(30, canvas.width / canvas.height, 1, 400)
+        // mvpMatrix.lookAt(7, 6, 5, 0, 0, 0, 0, 0, 1)
+        // mvpMatrix.multiply(modelMatrix)
+        // mvpMatrix.set(vpMatrix).multiply(modelMatrix)
+        // gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements)
 
         // 逆转置矩阵
         let u_NormalMatrix = gl.getUniformLocation(gl.program, 'u_NormalMatrix')
         let normalMatrix = new Matrix4()
-        normalMatrix.setInverseOf(modelMatrix)
-        normalMatrix.transpose()
-        gl.uniformMatrix4fv(u_NormalMatrix, false, normalMatrix.elements)
+        // normalMatrix.setInverseOf(modelMatrix)
+        // normalMatrix.transpose()
+        // gl.uniformMatrix4fv(u_NormalMatrix, false, normalMatrix.elements)
 
         let u_LightColor = gl.getUniformLocation(gl.program, 'u_LightColor')
         gl.uniform3f(u_LightColor, 1.0, 1.0, 1.0) // 白色光线
-        
-        // 设置光线方向
-        // let u_LightDirection = gl.getUniformLocation(gl.program, 'u_LightDirection')
 
         let u_LightPosition = gl.getUniformLocation(gl.program, 'u_LightPosition')
-        gl.uniform3f(u_LightPosition, 1.0, 4.0, 5.0)
-
-        // 漫反射光
-        // let lightDirection = new Vector3([0.5, 3.0, 4.0]) // 光线方向（世界坐标系）
-        // lightDirection.normalize() // 归一化
-        // gl.uniform3fv(u_LightDirection, lightDirection.elements)
+        gl.uniform3f(u_LightPosition, 2.3, 4.0, 3.5)
 
         // 环境色
         let u_AmbientLight = gl.getUniformLocation(gl.program, 'u_AmbientLight')
         gl.uniform3f(u_AmbientLight, 0.2, 0.2, 0.2)
-        
-        // let a = -1
-        // let interval = setInterval(() => {
-        //   if (a >= 1) {
-        //     // clearInterval(interval)
-        //     a = -1
-        //   }
-        //   a += 0.01
-        //   viewMatrix.setLookAt(a, 0.25, 0.25, 0, 0, 0, 0, 1, 0)
-        //   gl.uniformMatrix4fv(u_ViewMatrix, false, viewMatrix.elements)
 
-        //   gl.drawArrays(gl.TRIANGLES, 0, 9)
-        // }, 10)
+        let r = 0
+        setInterval(() => {
+          r = r + 1
+          gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+          modelMatrix.setRotate(r, 0, 1, 0)
+          gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements)
 
-        // let r = 0
-        // setInterval(() => {
-        //   r = r + 10
-        //   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-        //   modelMatrix.rotate(r, 0, 0, 1)
-        //   gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements)
-        //   gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_BYTE, 0)
-        // }, 100)
+          mvpMatrix.set(vpMatrix).multiply(modelMatrix)
+          gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements)
+
+          normalMatrix.setInverseOf(modelMatrix)
+          normalMatrix.transpose()
+          gl.uniformMatrix4fv(u_NormalMatrix, false, normalMatrix.elements)
+
+          gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_BYTE, 0)
+        }, 16)
 
 
         gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_BYTE, 0)
