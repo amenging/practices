@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Audio visualization</title>
+    <style>
+      canvas {
+        border-top: 1px solid black;
+        border-bottom: 1px solid black;
+        margin-bottom: -3px;
+        box-shadow: 0 -2px 4px rgba(0,0,0,0.7),
+                    0 3px 4px rgba(0,0,0,0.7);
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Audio visualization</h1>
+      </header>
+      <section class="control">
+        <button id="startBtn" size="default" type="default" loading="false" hover-class="button-hover">
+        Start
+        </button>
+      </section>
+      <section>
+        <canvas
+          id="bar" class="visualizer" width="800" height="800"></canvas>
+      </section>
+    </div>
+    <script src="./app.js"></script>
+  </body>
+</html>
