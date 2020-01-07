@@ -1,402 +1,429 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<title>编程练习</title>
+  <meta charset="UTF-8">
+  <title>编程练习</title>
 </head>
 <body>
-	<script type="text/javascript">
-		// === 算法数据结构相关 ===
+  <script type="text/javascript">
+    // === 算法数据结构相关 ===
 
-		
+    // 快速排序
+    function quicksort(arr) {
+      function sort(start, end) {
+        var tmp = arr[start];
+        var i = start, j = end-1;
+        if(end - start > 1) {
+          while (i < j) {
+            for (; i < j; j --) {
+              if (arr[j] <tmp) {
+                t = arr[i];
+                arr[i] = arr[j];
+                arr[j] = t;
+                break;
+              }
+            }
+            for (; i < j; i ++) {
+              if (arr[i] > tmp) {
+                t = arr[j]
+                arr[j] = arr[i]
+                arr[i] = t;
+                break;
+              }
+            }
+          }
 
-		// 快速排序
-		function quicksort(arr) {
-			function sort(start, end) {
-				var tmp = arr[start];
-				var i = start, j = end-1;
-				if(end - start > 1) {
-					while (i < j) {
-						for (; i < j; j --) {
-							if (arr[j] <tmp) {
-								t = arr[i];
-								arr[i] = arr[j];
-								arr[j] = t;
-								break;
-							}
-						}
-						for (; i < j; i ++) {
-							if (arr[i] > tmp) {
-								t = arr[j]
-								arr[j] = arr[i]
-								arr[i] = t;
-								break;
-							}
-						}
-					}
+          sort(0, i)
+          sort(i + 1, end)
+        }
+      }
+      sort(0, arr.length)
+      return arr;
+    }
 
-					sort(0, i)
-					sort(i + 1, end)
-				}
-			}
-			sort(0, arr.length)
-			return arr;
-		}
+    // console.log(quicksort([4,3,4,5,2,2,1,7,2,6]))
 
-		// console.log(quicksort([4,3,4,5,2,2,1,7,2,6]))
+    //两个数组的合并排序
+    function merge(arr1, arr2,cut) {
+      var l = arr1.length + arr2.length;
+      arr2.push('#');
 
-		//两个数组的合并排序
-		function merge(arr1, arr2,cut) {
-			var l = arr1.length + arr2.length;
-			arr2.push('#');
+      var i = j = 0;
+      var result = [];
 
-			var i = j = 0;
-			var result = [];
+      for (var m = 0; m < l; m ++) {
+        if (arr1[i] <= arr2[j] || arr2[j] == '#') {
+          result[m] = arr1[i]
+          i ++;
+        } else {
+          result[m] = arr2[j]
+          j ++;
+        }
+      }
 
-			for (var m = 0; m < l; m ++) {
-				if (arr1[i] <= arr2[j] || arr2[j] == '#') {
-					result[m] = arr1[i]
-					i ++;
-				} else {
-					result[m] = arr2[j]
-					j ++;
-				}
-			}
+      return result;
+    }
 
-			return result;
-		}
+    // console.log(merge([1,4,6],[2,3,5,7,9], 3))
+    
+    //选择排序
+    function choose(arr) {
+      for (var i = 0; i < arr.length; i ++) {
+        var key = i; // 当前位置
+        var tmp = current = arr [i]; // v为当前值，current为交换做准备
 
-		// console.log(merge([1,4,6],[2,3,5,7,9], 3))
-		
-		//选择排序
-		function choose(arr) {
-			for (var i = 0; i < arr.length; i ++) {
-				var key = i; // 当前位置
-				var tmp = current = arr [i]; // v为当前值，current为交换做准备
+        for (var j = i + 1; j < arr.length; j ++) {
+          if (arr[j] < current) { // 找出最小值索引
+            key = j;
+            current = arr[j]
+          }
+        }
 
-				for (var j = i + 1; j < arr.length; j ++) {
-					if (arr[j] < current) { // 找出最小值索引
-						key = j;
-						current = arr[j]
-					}
-				}
+        if (tmp != current) { // 若最小值索引发生改变，则交换位置
+          arr[i] = current;
+          arr[key] = tmp;
+        }
+      }
 
-				if (tmp != current) { // 若最小值索引发生改变，则交换位置
-					arr[i] = current;
-					arr[key] = tmp;
-				}
-			}
+      return arr;
+    }
 
-			return arr;
-		}
+    console.log(choose([1, 4, 2, 5]))
 
-		console.log(choose([1, 4, 2, 5]))
+    // 逆波兰式
+    function rp(str) {
+      var arr = str.split('');
+      var ops = '+-#*/'.split('')
+      var result = [], temp = [];
+      arr.forEach(function(ele, ind) {
+        if (ele == '(') {
+          temp.push(ele)
+        } else if (ele == ')') {
+          var flag = true;
+          while (flag) {
+            if (temp[temp.length-1] != '(') {
+              result.push(temp.pop())
+            } else {
+              temp.pop();
+              flag = false;
+            }
+          }
+        } else if (ops.indexOf(ele) != -1) {
+          cb(ele, temp)
+          function cb(x, o) {
+            if (o.length == 0 || o[o.length-1] == '(' || 
+              ops.indexOf(x) - ops.indexOf(o[o.length-1]) > 2) {
+              o.push(x)
+            }  else {
+              result.push(o.pop());
+              return cb(x, o)
+            }
+          }
+        } else {
+          result.push(ele)
+        }
+      })
+      while (temp.length > 0) {
+        if(temp[temp.length-1] != '(') {
+          result.push(temp.pop())
+        } else {
+          temp.pop()
+        }
+      }
+      return result.join('');
+    }
+    // console.log(rp('(a+b)*c-(a+b)/e'))
+    // console.log(rp('a+(b+c)*d-e'))
 
-		// 逆波兰式
-		function rp(str) {
-			var arr = str.split('');
-			var ops = '+-#*/'.split('')
-			var result = [], temp = [];
-			arr.forEach(function(ele, ind) {
-				if (ele == '(') {
-					temp.push(ele)
-				} else if (ele == ')') {
-					var flag = true;
-					while (flag) {
-						if (temp[temp.length-1] != '(') {
-							result.push(temp.pop())
-						} else {
-							temp.pop();
-							flag = false;
-						}
-					}
-				} else if (ops.indexOf(ele) != -1) {
-					cb(ele, temp)
-					function cb(x, o) {
-						if (o.length == 0 || o[o.length-1] == '(' || 
-							ops.indexOf(x) - ops.indexOf(o[o.length-1]) > 2) {
-							o.push(x)
-						}  else {
-							result.push(o.pop());
-							return cb(x, o)
-						}
-					}
-				} else {
-					result.push(ele)
-				}
-			})
-			while (temp.length > 0) {
-				if(temp[temp.length-1] != '(') {
-					result.push(temp.pop())
-				} else {
-					temp.pop()
-				}
-			}
-			return result.join('');
-		}
-		// console.log(rp('(a+b)*c-(a+b)/e'))
-		// console.log(rp('a+(b+c)*d-e'))
+    //欧几里得算法
+    function gcd (q, p) {
+      return p == 0 ? q : gcd(p, q%p)
+    }
+    // console.log(gcd (4, 5))
 
-		//欧几里得算法
-		function gcd (q, p) {
-			return p == 0 ? q : gcd(p, q%p)
-		}
-		// console.log(gcd (4, 5))
+    //插入排序
+    function insert(arr, n) {
+      for (var j = 1; j < arr.length; j ++) {
+        var key = arr[j];
+        var i = j - 1;
+        while (i >= 0 && arr[i] >key) {
+          arr[i+1] = arr[i];
+          i = i -1;
+          console.log(i)
+        }
+        arr[i+1] = key;
+      }
+      console.log(arr)
+    }
 
-		//插入排序
-		function insert(arr, n) {
-			for (var j = 1; j < arr.length; j ++) {
-				var key = arr[j];
-				var i = j - 1;
-				while (i >= 0 && arr[i] >key) {
-					arr[i+1] = arr[i];
-					i = i -1;
-					console.log(i)
-				}
-				arr[i+1] = key;
-			}
-			console.log(arr)
-		}
+    // insert([5, 7, 4, 6, 8, 3])
 
-		// insert([5, 7, 4, 6, 8, 3])
-
-		'有两个各存放在数组A和数组B中的二进制整数，考虑他们的想加问题，结果存在的数组C中'
-			// 思路：
-			// 假设A.length <= B.length，从末位开始相加
-			// 初始化一个结果栈，一个进位字符
-			// 对于A和B当前位置的两个数a和b
-			// 1.进位字符为0：
-			//   若a和b都为0，将0推入结果栈
-			//   若a和b一方为0一方为1，将1推入结果栈
-			//   若a和b都为1，将0推入结果栈，进位字符设为1
-			// 2.进位字符为1：
-			//   若a和b都为0，将1推入结果栈并且将进位字符设为0
-			//   若a和b一方为0一方为1，将0推入结果栈
-	    //   若a和b都为1，将1推入结果栈
-	    // 遍历结束后
-	    //   若进位字符为1
-	    //     若B内还有值未遍历，从B为遍历的最后一位开始做进位判断
-	    //     若B内无值未遍历，则将1推入结果
-	    //   若进位字符为0，B内还有字符未遍历
-	    //     将B内剩余字符推入结果栈
+    '有两个各存放在数组A和数组B中的二进制整数，考虑他们的想加问题，结果存在的数组C中'
+      // 思路：
+      // 假设A.length <= B.length，从末位开始相加
+      // 初始化一个结果栈，一个进位字符
+      // 对于A和B当前位置的两个数a和b
+      // 1.进位字符为0：
+      //   若a和b都为0，将0推入结果栈
+      //   若a和b一方为0一方为1，将1推入结果栈
+      //   若a和b都为1，将0推入结果栈，进位字符设为1
+      // 2.进位字符为1：
+      //   若a和b都为0，将1推入结果栈并且将进位字符设为0
+      //   若a和b一方为0一方为1，将0推入结果栈
+      //   若a和b都为1，将1推入结果栈
+      // 遍历结束后
+      //   若进位字符为1
+      //     若B内还有值未遍历，从B为遍历的最后一位开始做进位判断
+      //     若B内无值未遍历，则将1推入结果
+      //   若进位字符为0，B内还有字符未遍历
+      //     将B内剩余字符推入结果栈
 
     function add(A, B) {
-    	var result = [];
-    	var flag = 0;
-    	for (var i = A.length - 1, j = B.length - 1; i >= 0, j >= 0; i --, j --) {
-    		if (flag == 0) {
-	    		if (A[i] + B[j] == 0) {
-	    			result.push(0);
-	    		} else if (A[i] + B[j] == 1) {
-	    			result.push(1);
-	    		} else if (A[i] + B[j] == 2) {
-	    			result.push(0);
-	    			flag = 1;
-	    		}
-    		} else {
-    			if (A[i] + B[j] == 0) {
-	    			result.push(1);
-	    			flag = 0;
-	    		} else if (A[i] + B[j] == 1) {
-	    			result.push(0);
-	    		} else if (A[i] + B[j] == 2){
-	    			result.push(1);
-	    		}
-    		}
-    	}
-    	if(flag == 1) {
-    		if (B.length > A.length) {
-    			var j = B.length - A.length-1
-    			while (j >= 0) {
-    				if (B[j] + flag == 0) {
-		    			result.push(0);
-		    		} else if (B[j] + flag == 1) {
-		    			result.push(1);
-		    			flag = 0;
-		    		} else if (B[j] + flag == 2){
-		    			result.push(0);
-		    			flag = 1;
-			    	} else {
-		    			flag = 0;
-		    		}
-	    			j --;
-    			}
-    			if (flag) { result.push(1); }
-	    	} else {
-	  			result.push(1);
-    		}
-	    } else {
-    		if (B.length > A.length) {
-    			var j = B.length - A.length -1
-    			while (j >= 0) {
-    				result.push(B[j])
-    				j --
-    			}
-    		}
-    	}
-    	console.log(result.reverse())
+      var result = [];
+      var flag = 0;
+      for (var i = A.length - 1, j = B.length - 1; i >= 0, j >= 0; i --, j --) {
+        if (flag == 0) {
+          if (A[i] + B[j] == 0) {
+            result.push(0);
+          } else if (A[i] + B[j] == 1) {
+            result.push(1);
+          } else if (A[i] + B[j] == 2) {
+            result.push(0);
+            flag = 1;
+          }
+        } else {
+          if (A[i] + B[j] == 0) {
+            result.push(1);
+            flag = 0;
+          } else if (A[i] + B[j] == 1) {
+            result.push(0);
+          } else if (A[i] + B[j] == 2){
+            result.push(1);
+          }
+        }
+      }
+      if(flag == 1) {
+        if (B.length > A.length) {
+          var j = B.length - A.length-1
+          while (j >= 0) {
+            if (B[j] + flag == 0) {
+              result.push(0);
+            } else if (B[j] + flag == 1) {
+              result.push(1);
+              flag = 0;
+            } else if (B[j] + flag == 2){
+              result.push(0);
+              flag = 1;
+            } else {
+              flag = 0;
+            }
+            j --;
+          }
+          if (flag) { result.push(1); }
+        } else {
+          result.push(1);
+        }
+      } else {
+        if (B.length > A.length) {
+          var j = B.length - A.length -1
+          while (j >= 0) {
+            result.push(B[j])
+            j --
+          }
+        }
+      }
+      console.log(result.reverse())
     }
     // add([1, 0, 1], [1, 1, 0])
+  </script>
 
-	</script>
-	<script type="text/javascript">
-		// 练习题
-		`在一个二维数组中，每一行都按照从左到右递增的顺序排序，每一列都按照从上到下递增的顺序排序。
-		请完成一个函数，输入这样的一个二维数组和一个整数，判断数组中是否含有该整数。`
-		// 思路
-		// 从二维数组的左下角开始查找，向上数字递减，向右递增
-		// 这样，目标大于此数字向右，小于此数字向上
-		function Find(target, array) {
-		    var row = array.length -1;
-		    var column = array[0].length -1;
-		    
-		    var i = row;
-		    var j = 0;
-		    
-		    if (target< array[0][0] || target > array[row][column]) {
-		      return false;
-		    }
-		    
-		    return (function fin(i, j) {
-		    	if (i >= 0 && j >= 0) {
-		    		var current = array[i][j];
-			      if (target == current) {
-			        return true;
-			      } else if (target > current){
-			        return fin(i, j+1);
-			      } else if (target < current) {
-			        return fin(i-1, j);
-			      }
-		    	}
-		      return false;
-		    })(i, j)
-		}
-		// console.log(Find(5,[[1,2,8,9],[2,4,9,12],[4,7,10,13],[6,8,11,15]]))
+  <script type="text/javascript">
+    // 练习题
+    `在一个二维数组中，每一行都按照从左到右递增的顺序排序，每一列都按照从上到下递增的顺序排序。
+    请完成一个函数，输入这样的一个二维数组和一个整数，判断数组中是否含有该整数。`
+    // 思路
+    // 从二维数组的左下角开始查找，向上数字递减，向右递增
+    // 这样，目标大于此数字向右，小于此数字向上
+    function Find(target, array) {
+        var row = array.length -1;
+        var column = array[0].length -1;
+        
+        var i = row;
+        var j = 0;
+        
+        if (target< array[0][0] || target > array[row][column]) {
+          return false;
+        }
+        
+        return (function fin(i, j) {
+          if (i >= 0 && j >= 0) {
+            var current = array[i][j];
+            if (target == current) {
+              return true;
+            } else if (target > current){
+              return fin(i, j+1);
+            } else if (target < current) {
+              return fin(i-1, j);
+            }
+          }
+          return false;
+        })(i, j)
+    }
+    // console.log(Find(5,[[1,2,8,9],[2,4,9,12],[4,7,10,13],[6,8,11,15]]))
 
 
-		// 牛牛有n张卡片排成一个序列.每张卡片一面是黑色的,另一面是白色的。初始状态的时候有些卡片是黑色朝上,有些卡片是白色朝上。牛牛现在想要把一些卡片翻过来,得到一种交替排列的形式,即每对相邻卡片的颜色都是不一样的。牛牛想知道最少需要翻转多少张卡片可以变成交替排列的形式。 
-		//解题思路
-		// 排序的可能性只有BWBWBW....或者WBWBWB....两种
-		// 所以如果第一位是B，就一定是第一种，反之是第二张
-		// 于是判断两种情况，实际上就是将参数与两种形式都做比较
-		// 选出翻转次数小的
-		function bw(s) {
-			var a = s.split('')
-			var n1 = 0;
-			var n2 = 0;
-			for (var i =0; i < s.length; i ++) {
-				if (i % 2 == 0) {
-					if (s[i] == 'W') {
-						n1 += 1;
-					} else {
-						n2 += 1;
-					}
-				} else {
-					if (s[i] == 'B') {
-						n1 += 1;
-					} else {
-						n2 += 1;
-					}
-				}
-			}
-			console.log(Math.min(n1, n2))
-		}
+    // 牛牛有n张卡片排成一个序列.每张卡片一面是黑色的,另一面是白色的。初始状态的时候有些卡片是黑色朝上,有些卡片是白色朝上。牛牛现在想要把一些卡片翻过来,得到一种交替排列的形式,即每对相邻卡片的颜色都是不一样的。牛牛想知道最少需要翻转多少张卡片可以变成交替排列的形式。 
+    //解题思路
+    // 排序的可能性只有BWBWBW....或者WBWBWB....两种
+    // 所以如果第一位是B，就一定是第一种，反之是第二张
+    // 于是判断两种情况，实际上就是将参数与两种形式都做比较
+    // 选出翻转次数小的
+    function bw(s) {
+      var a = s.split('')
+      var n1 = 0;
+      var n2 = 0;
+      for (var i =0; i < s.length; i ++) {
+        if (i % 2 == 0) {
+          if (s[i] == 'W') {
+            n1 += 1;
+          } else {
+            n2 += 1;
+          }
+        } else {
+          if (s[i] == 'B') {
+            n1 += 1;
+          } else {
+            n2 += 1;
+          }
+        }
+      }
+      console.log(Math.min(n1, n2))
+    }
 
-		// bw('BBWBWWBWBWWBBBWBWBWBBWBBW')
+    // bw('BBWBWWBWBWWBBBWBWBWBBWBBW')
 
-		// 牛牛变得黑化了,想要摧毁掉地球。但他忘记了开启地球毁灭器的密码。牛牛手里有一个字符串S,牛牛还记得从S中去掉一个字符就恰好是正确的密码,请你帮牛牛求出他最多需要尝试多少次密码。
-		// 如样例所示S = "ABA",3个可能的密码是"BA", "AA", "AB".
-		// 当S = "A", 牛牛唯一可以尝试的密码是一个空的密码,所以输出1.
-		// 解题思路
-		// 列出所有可能性，去重
-		function earth(s) {
-			var a = s.split('')
-			var b = []
-			for (var i = 0; i < s.length; i ++) {
-				var arr = [].concat(a);
-				arr.splice(i, 1);
-				if(b.indexOf(arr.join('')) == -1) {
-					b.push(arr.join(''))
-				}
-			}
-			console.log(b.length)
-		} 
-		// earth('A')
+    // 牛牛变得黑化了,想要摧毁掉地球。但他忘记了开启地球毁灭器的密码。牛牛手里有一个字符串S,牛牛还记得从S中去掉一个字符就恰好是正确的密码,请你帮牛牛求出他最多需要尝试多少次密码。
+    // 如样例所示S = "ABA",3个可能的密码是"BA", "AA", "AB".
+    // 当S = "A", 牛牛唯一可以尝试的密码是一个空的密码,所以输出1.
+    // 解题思路
+    // 列出所有可能性，去重
+    function earth(s) {
+      var a = s.split('')
+      var b = []
+      for (var i = 0; i < s.length; i ++) {
+        var arr = [].concat(a);
+        arr.splice(i, 1);
+        if(b.indexOf(arr.join('')) == -1) {
+          b.push(arr.join(''))
+        }
+      }
+      console.log(b.length)
+    } 
+    // earth('A')
 
-	//输入一个整数n，请你输出斐波那契数列的第n项。
-	function Fibonacci(num) {
-		if (num == 0) return 0;
-		if (num < 3) {
-			return 1;
-		} else {
-			var arr = [1, 1];
-			for (var i = 0; i < num-2; i ++) {
-				var cache = arr[1];
-				arr[1] = arr[0] + arr[1];
-				arr[0] = cache;
-			}
-		}
-		return arr[1]
-	}
+    //输入一个整数n，请你输出斐波那契数列的第n项。
+    function Fibonacci(num) {
+      if (num == 0) return 0;
+      if (num < 3) {
+        return 1;
+      } else {
+        var arr = [1, 1];
+        for (var i = 0; i < num-2; i ++) {
+          var cache = arr[1];
+          arr[1] = arr[0] + arr[1];
+          arr[0] = cache;
+        }
+      }
+      return arr[1]
+    }
+  // console.log(Fibonacci(3))
+  </script>
 
-	// console.log(Fibonacci(3))
-	</script>
+  <!-- 2018-03-07 -->
+  <script type="text/javascript">
+    /* jshint esversion: 6 */
+    // 美国号码验证
+    function telephoneCheck(str) {
+      var reg = /^([1]|\b)\s?((\d{10})|(\d{3}(\-|\s)\d{3}(\-|\s)\d{4})|(\(\d{3}\)\s?\d{3}\-\d{4}))$|^(\(\d{3}\)\s?\d{3}\-\d{4})$/g;
+      return reg.test(str);
+    }
+    console.log(telephoneCheck("(555)555-5555"));
 
-	<!-- 2018-03-07 -->
-	<script type="text/javascript">
-		/* jshint esversion: 6 */
-			// 美国号码验证
-			function telephoneCheck(str) {
-			  var reg = /^([1]|\b)\s?((\d{10})|(\d{3}(\-|\s)\d{3}(\-|\s)\d{4})|(\(\d{3}\)\s?\d{3}\-\d{4}))$|^(\(\d{3}\)\s?\d{3}\-\d{4})$/g;
-			  return reg.test(str);
-			}
-			console.log(telephoneCheck("(555)555-5555"));
+    //对称差分
+    function sym(...args) {
+      var j = 1;
+      var arr;
+      function compare(a, b) {
+        arr = a.concat(b).filter(v => !a.includes(v) || !b.includes(v))
+        while (j < args.length-1) {
+          compare(arr, args[++j]);
+        }
+        return arr;
+      }
+      var result = compare(args[0], args[1]).sort((a, b) => a - b);
+      return Array.from(new Set([...result]));
+    }
+    console.log(sym([3, 3, 3, 2, 5], [2, 1, 5, 7], [3, 4, 6, 6], [1, 2, 3]));
 
-			//对称差分
-			function sym(...args) {
-				var j = 1;
-				var arr;
-				function compare(a, b) {
-					arr = a.concat(b).filter(v => !a.includes(v) || !b.includes(v))
-					while (j < args.length-1) {
-						compare(arr, args[++j]);
-					}
-					return arr;
-				}
-				var result = compare(args[0], args[1]).sort((a, b) => a - b);
-				return Array.from(new Set([...result]));
-			}
-			console.log(sym([3, 3, 3, 2, 5], [2, 1, 5, 7], [3, 4, 6, 6], [1, 2, 3]));
+    //二维数组合并去重
+    function updateInventory(arr1, arr2) {
+      for (var i = 0; i < arr1.length; i ++) {
+        for (var j = 0; j < arr2.length; j ++) {
+          if (arr1[i][1] == arr2[j][1]) {
+            arr1[i][0] += arr2[j][0];
+            arr2.splice(j, 1);
+          }
+        }
+      }
+      var arr = arr1.concat(arr2);
+      return arr.sort((a, b) => {
+        return a[1].localeCompare(b[1]);
+      });
+    }
+    // 仓库库存示例
+    var curInv = [
+      [21, "Bowling Ball"],
+      [2, "Dirty Sock"],
+      [1, "Hair Pin"],
+      [5, "Microphone"]
+    ];
+    var newInv = [
+      [2, "Hair Pin"],
+      [3, "Half-Eaten Apple"],
+      [67, "Bowling Ball"],
+      [7, "Toothpaste"]
+    ];
+    updateInventory(curInv, newInv);
+  </script>
 
-			//二维数组合并去重
-			function updateInventory(arr1, arr2) {
-		    for (var i = 0; i < arr1.length; i ++) {
-		      for (var j = 0; j < arr2.length; j ++) {
-		        if (arr1[i][1] == arr2[j][1]) {
-		          arr1[i][0] += arr2[j][0];
-		          arr2.splice(j, 1);
-		        }
-		      }
-		    }
-		    var arr = arr1.concat(arr2);
-		    return arr.sort((a, b) => {
-		      return a[1].localeCompare(b[1]);
-		    });
-			}
-			// 仓库库存示例
-			var curInv = [
-		    [21, "Bowling Ball"],
-		    [2, "Dirty Sock"],
-		    [1, "Hair Pin"],
-		    [5, "Microphone"]
-			];
-			var newInv = [
-		    [2, "Hair Pin"],
-		    [3, "Half-Eaten Apple"],
-		    [67, "Bowling Ball"],
-		    [7, "Toothpaste"]
-			];
-			updateInventory(curInv, newInv);
-		</script>
+  <!-- 2020-01-07 -->
+  <script type="text/javascript">
+    // leetcode练习
+    // 两数之和：https://leetcode-cn.com/problems/two-sum/submissions/
+    // 不好的解法，循环数组
+    var twoSum = function(nums, target) {
+      var l = nums.length
+      for (var i = 0; i < l; i ++) {
+        for (var j = i + 1; j < l; j ++) {
+          if (nums[i] + nums[j] == target) {
+            return[i, j]
+          }
+        }
+      }
+    };
+
+    // 好一些的解法，使用哈希，查询速度更快
+    var twoSum = function(nums, target) {
+      var tmp, hash = {}
+      nums.forEach((ele, ind) => hash[ele] = ind)
+
+      for (var i in nums) {
+        tmp = target - nums[i]
+        if (typeof hash[tmp] != 'undefined' && hash[tmp] != i) {
+          return [i / 1, hash[tmp]]
+        }
+      }
+    };
+  </script>
 </body>
 </html>
